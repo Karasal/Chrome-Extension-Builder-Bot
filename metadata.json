@@ -1,0 +1,7 @@
+{
+  "name": "ChromeExtensionBuilderBot",
+  "description": "An AI-powered bot to build, document, and export production-ready Chrome Extensions with one-click ZIP generation.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
