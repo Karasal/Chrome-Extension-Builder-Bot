@@ -41,7 +41,12 @@ export const generateExtensionProject = async (idea: string): Promise<ExtensionP
       },
     });
 
-    return JSON.parse(response.text);
+    const text = response.text;
+    if (!text) {
+      throw new Error("Gemini returned an empty response.");
+    }
+
+    return JSON.parse(text) as ExtensionProject;
   } catch (error) {
     console.error("Gemini Project Generation Error:", error);
     return null;
@@ -57,7 +62,7 @@ export const getExtensionAdvice = async (prompt: string, projectContext: string)
         systemInstruction: "You are an expert Chrome Extension developer assistant. Use the provided project context to answer questions specifically about the extension currently being built. Be helpful, concise, and provide code snippets if necessary.",
       },
     });
-    return response.text;
+    return response.text || "No response received from AI.";
   } catch (error) {
     console.error("Gemini Advice Error:", error);
     return "I encountered an error. Please try again.";

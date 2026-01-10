@@ -122,7 +122,12 @@ const App: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap justify-center gap-3 text-sm pt-4">
-            {['AI Summary Tool', 'Dark Mode Toggle', 'Tab Organizer', 'Price Tracker'].map(preset => (
+            {[
+              'Take screenshot & Rename Architect title', 
+              'AI Summary Tool', 
+              'Dark Mode Toggle', 
+              'Price Tracker'
+            ].map(preset => (
               <button 
                 key={preset}
                 onClick={() => setIdea(preset)}
