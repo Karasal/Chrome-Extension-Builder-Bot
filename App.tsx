@@ -44,13 +44,36 @@ const App: React.FC = () => {
     setIsLoading(false);
   };
 
+  const base64ToUint8Array = (base64: string): Uint8Array => {
+    try {
+      // Remove data URI prefix if present
+      const base64String = base64.includes(',') ? base64.split(',')[1] : base64;
+      const binaryString = atob(base64String.trim());
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes;
+    } catch (e) {
+      console.error("Base64 decoding failed", e);
+      return new Uint8Array();
+    }
+  };
+
   const handleDownloadZip = async () => {
     if (!project || isDownloading) return;
     setIsDownloading(true);
     try {
       const zip = new JSZip();
       project.files.forEach(file => {
-        zip.file(file.name, file.content);
+        if (file.name.toLowerCase().endsWith('.png')) {
+          // Handle binary PNG data
+          const binaryData = base64ToUint8Array(file.content);
+          zip.file(file.name, binaryData);
+        } else {
+          zip.file(file.name, file.content);
+        }
       });
       const content = await zip.generateAsync({ type: "blob" });
       const url = URL.createObjectURL(content);
@@ -290,11 +313,24 @@ const App: React.FC = () => {
                       </div>
                       <div>
                         <h4 className="text-lg font-bold text-slate-100">{file.name}</h4>
-                        <p className="text-sm text-slate-500">{file.description}</p>
+                        <p className="text-sm text-slate-500">
+                          {file.name.toLowerCase().endsWith('.png') ? 'Binary Image Data' : file.description}
+                        </p>
                       </div>
                     </div>
                   </div>
-                  <CodeBlock fileName={file.name} content={file.content} language={file.language} />
+                  {file.name.toLowerCase().endsWith('.png') ? (
+                    <div className="bg-slate-900 rounded-lg p-8 border border-slate-700 flex flex-col items-center justify-center gap-4">
+                       <img 
+                        src={file.content.startsWith('data:') ? file.content : `data:image/png;base64,${file.content}`} 
+                        alt="Generated Icon" 
+                        className="w-32 h-32 rounded-xl shadow-2xl border border-slate-700"
+                       />
+                       <span className="text-xs text-slate-500 font-mono uppercase tracking-widest">Binary Preview</span>
+                    </div>
+                  ) : (
+                    <CodeBlock fileName={file.name} content={file.content} language={file.language} />
+                  )}
                 </div>
               ))}
             </div>

@@ -10,7 +10,7 @@ export const generateExtensionProject = async (idea: string): Promise<ExtensionP
       model: 'gemini-3-flash-preview',
       contents: `Generate a complete Chrome Extension project for this idea: "${idea}"`,
       config: {
-        systemInstruction: "You are an expert Chrome Extension architect. Generate a valid, functional project including manifest.json (v3), popup/background scripts, and UI. Ensure the code is modern, secure, and follows Chrome Extension best practices. Output a structured JSON object.",
+        systemInstruction: "You are an expert Chrome Extension architect. Generate a valid, functional project including manifest.json (v3), popup/background scripts, and UI. CRITICAL: Always include an 'icon.png' file in the files array. Since you are a text model, provide a valid, small base64-encoded string for a 128x128 PNG icon (or a simple placeholder base64). Ensure 'manifest.json' correctly references this 'icon.png' in the 'icons' (16, 48, 128) field. Ensure the code is modern, secure, and follows Chrome Extension best practices. Output a structured JSON object.",
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -27,10 +27,10 @@ export const generateExtensionProject = async (idea: string): Promise<ExtensionP
               items: {
                 type: Type.OBJECT,
                 properties: {
-                  name: { type: Type.STRING, description: "The filename (e.g., manifest.json, popup.js)." },
-                  language: { type: Type.STRING, description: "The coding language." },
-                  content: { type: Type.STRING, description: "The full source code for the file." },
-                  description: { type: Type.STRING, description: "A brief note on what this file does in the context of the project." }
+                  name: { type: Type.STRING, description: "The filename (e.g., manifest.json, popup.js, icon.png)." },
+                  language: { type: Type.STRING, description: "The coding language (e.g., json, javascript, png)." },
+                  content: { type: Type.STRING, description: "The source code or base64 string for the file." },
+                  description: { type: Type.STRING, description: "A brief note on what this file does." }
                 },
                 required: ["name", "language", "content", "description"]
               }
